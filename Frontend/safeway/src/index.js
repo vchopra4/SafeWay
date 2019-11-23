@@ -4,6 +4,8 @@ import './reset.css';
 import './index.css';
 import Map from './Map'
 
+let response;
+
 class Topbar extends React.Component {
     render() {
         return (
@@ -33,8 +35,29 @@ class Search extends React.Component {
         });
     }
     handleSubmit(event) {
-        // this line represents the information for the post request
-        alert('Start: ' + this.state.start + ", End: " + this.state.end);
+        let payload = {
+            start: this.state.start,
+            end: this.state.end,
+            
+            };
+            let data = new FormData();
+            data.append( "json", JSON.stringify( payload ) );
+
+        response = fetch("http://127.0.0.1:5000/direction", {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            let json = response.json();
+            console.log(json);
+        } else {
+            alert("HTTP-Error: " + response.status)
+        }
         event.preventDefault();
     }
     render() {
@@ -56,7 +79,7 @@ class App extends React.Component {
             <div className="app">
                 <Topbar />
                 <Search />
-                <Map />
+                <Map path={response}/>
             </div>
             
 
