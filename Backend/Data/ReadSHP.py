@@ -17,4 +17,3 @@ class ReadSHPFile:
         for i in range(len(features)):
             dt = features[i].shape.__geo_interface__
             self.points.append(dt)
-
