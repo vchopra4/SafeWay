@@ -4,6 +4,7 @@ import pandas as pd
 class Accident:
 
     data = []
+    acc_numbers = {}
 
     def __init__(self, f_name):
         self.f_name = f_name
@@ -12,11 +13,14 @@ class Accident:
 
     def read_file(self):
         for f in self.frame.index.values:
-            lat = self.frame.loc[f, 'LATITUDE']
-            long = self.frame.loc[f, 'LONGITUDE']
-            fatal = self.frame.loc[f, 'ACCLASS']
-            ped = self.frame.loc[f, 'IMPACTYPE']
-            self.data.append(Location(lat, long, fatal, ped))
+            if self.frame.loc[f, 'ACCNUM'] not in self.acc_numbers:
+                self.acc_numbers[self.frame.loc[f, 'ACCNUM']] = 1
+                lat = self.frame.loc[f, 'LATITUDE']
+                long = self.frame.loc[f, 'LONGITUDE']
+                fatal = self.frame.loc[f, 'ACCLASS']
+                ped = self.frame.loc[f, 'IMPACTYPE']
+
+                self.data.append(Location(lat, long, fatal, ped))
 
 
 class Location:
