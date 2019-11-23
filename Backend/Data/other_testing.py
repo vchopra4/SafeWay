@@ -57,6 +57,7 @@ def relationship_road_traffic_accidents():
     model = sm.OLS(ys, xs).fit()
 
     print(model.summary())
+    print(model.params)
 
 
 relationship_road_traffic_accidents()

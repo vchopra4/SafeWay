@@ -1,5 +1,6 @@
 import geopandas
 
+
 def getCoordinates(fileName, attribute):
     data = geopandas.read_file(fileName)
     finalList = []
