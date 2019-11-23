@@ -1,19 +1,21 @@
+@import url('https://fonts.googleapis.com/css?family=Amiko&display=swap');
+
 .app {
     display: grid;
     grid-template-columns: 10vw 10vw 10vw 10vw 10vw 10vw 10vw 10vw 10vw 10vw;
-    grid-template-rows: auto;
+    grid-template-rows: 5vh 5vh 90vh;
 
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Amiko, sans-serif;
 }
 .topbar {
     grid-column: 1 / 11;
     grid-row: 1 / 1;
     
     color: white;
-
+    font-weight: bold;
     padding: 1vh;
 
-    background-color: rgb(0,0,0);
+    background-color: #0197F6;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -25,22 +27,34 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-flow: row wrap;
+    flex-wrap: wrap;
 }
 .start{
     order: 1;
-
+    font-weight: bold;
     padding: 1vh;
-    width: 30vh;
+    height: 5vh;
+    width: 30vw;
     display: flex;
     flex-grow: 2;
+    box-sizing: border-box;
     
 }
-.end{
+.end {
     order: 2;
-    width: 30vh;
-    padding: 1vh;
+    font-weight: bold;
+    height: 5vh;
+    width: 30vw;
     flex-grow: 2;
+    box-sizing: border-box;
+    padding: 1vh;
+}
+.submit {
+    order: 3;
+
+    height: 5vh;
+    width: 10vw;
+    box-sizing: border-box;
 }
 .map {
     grid-column: 1 / 11;

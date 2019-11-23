@@ -8,7 +8,7 @@ class Topbar extends React.Component {
     render() {
         return (
             <div className="topbar">
-                <h1>Safeway</h1>
+                <h1>SAFEWAY</h1>
             </div>
             
         )
@@ -19,9 +19,11 @@ class Search extends React.Component {
     render() {
         return (
             <div className="search">
-                <input className="start" placeholder="start"></input>
+                <input className="start" placeholder="Start"></input>
                 
-                <input className="end" placeholder="end"></input>
+                <input className="end" placeholder="End"></input>
+
+                <input className="submit" type="submit"></input>
             </div>
             
         )

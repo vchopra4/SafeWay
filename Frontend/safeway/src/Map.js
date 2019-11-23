@@ -58,7 +58,7 @@ export default () => (
   <MapComponent
     googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyA05IZP-_GDgylMrM22XBYZ9qUxiTXjq-w&v=3.exp&libraries=geometry,drawing,places"
     loadingElement={<div style={{ height: `100%` }} />}
-    containerElement={<div style={{ height: `400px`, width: "500px" }} />}
+    containerElement={<div style={{ height: `auto`, width: "100vw" }} />}
     mapElement={<div style={{ height: `100%` }} />}
   />
 );
