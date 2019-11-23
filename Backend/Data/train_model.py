@@ -75,6 +75,6 @@ def training_model():
 
         X.append(small_x)
 
-    # X = normalize(X, axis=0, norm='l1')
+    X = normalize(X, axis=0, norm='l1')
 
     return X

@@ -30,10 +30,10 @@ def run():
     random_data = [data[rand]]
     print(random_data)
 
-    kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(data)
+    kde = KernelDensity(kernel='gaussian', bandwidth=0.0001).fit(data)
 
     return kde.score_samples(random_data)[0]
 
 
 if __name__ == '__main__':
-    run()
+    print(-run())
