@@ -5,3 +5,7 @@ Railways/Subway: https://open.toronto.ca/dataset/ttc-subway-shapefiles/
 Trees: https://open.toronto.ca/dataset/physical-location-of-trees/
 Traffic Volumes: https://open.toronto.ca/dataset/traffic-signal-vehicle-and-pedestrian-volumes/
 Intersection Types: https://open.toronto.ca/dataset/intersection-file-city-of-toronto/
+shapefiles\CENTRELINE_INTERSECTION_WGS84.shp
+shapefiles\School locations-all types data.shp
+shapefiles\TOPO_POLES_WGS84 - TSignals.shp
+shapefiles\TOPO_POLES_WGS84.shp

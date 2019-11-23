@@ -1,7 +1,7 @@
 import glob
 import ReadSHP
 import ReadAccident
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import RobustScaler
 import pandas as pd
 import math
 
@@ -33,6 +33,7 @@ def training_model():
     shp_data_objs = []
 
     for shp in shp_files:
+        print(shp)
         shp_obj = ReadSHP.ReadSHPFile(shp, shp)
         shp_data_objs.append(shp_obj)
 
@@ -41,7 +42,7 @@ def training_model():
     for file in accident_files:
         a = ReadAccident.Accident(file)
 
-    want_adjustment = True
+    want_adjustment = False
 
     adjustment_traffic = 1 + 0.635
 
@@ -71,11 +72,11 @@ def training_model():
                 dist = calc_dist_shp(shp_data_objs[shp], long, lat)
                 small_x.append(dist)
 
-        small_x.append(adjustment_traffic*dist_t_traffic(long, lat))
+            small_x.append(adjustment_traffic*dist_t_traffic(long, lat))
 
-        X.append(small_x)
+            X.append(small_x)
 
-    scaler = MinMaxScaler(copy=True, feature_range=(-100, 100))
+    scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
     scaler.fit(X)
     X = scaler.transform(X)
 

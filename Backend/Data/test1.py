@@ -28,13 +28,16 @@ def run_t():
 def run():
     data = train_model.training_model()
 
-    rand = int(random()*(len(data)-1))
-    random_data = [data[rand]]
+    random_data = []
+    for i in range(10):
+        rand = int(random()*(len(data)-1))
+        random_data.append(data[rand])
     print(random_data)
 
-    kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(data)
-    pickle.dumps(kde)
-    return kde.score_samples(random_data)[0]
+    kde = KernelDensity(kernel='gaussian', bandwidth=0.6).fit(data)
+    filehandler = open('model.pickle', 'wb')
+    pickle.dump(kde, filehandler)
+    return kde.score_samples(random_data)
 
 
 if __name__ == '__main__':
