@@ -1,7 +1,7 @@
 import glob
 import ReadSHP
 import ReadAccident
-from sklearn.preprocessing import normalize
+from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 import math
 
@@ -75,6 +75,8 @@ def training_model():
 
         X.append(small_x)
 
-    X = normalize(X, axis=0, norm='l1')
+    scaler = MinMaxScaler(copy=True, feature_range=(-100, 100))
+    scaler.fit(X)
+    X = scaler.transform(X)
 
     return X

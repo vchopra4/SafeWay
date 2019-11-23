@@ -3,6 +3,8 @@ import numpy as np
 from random import random
 import matplotlib.pyplot as mp
 import train_model
+import pickle
+
 
 def run_t():
     X = np.array([[-3, -3], [-2, -2], [-1, -1], [0, 0], [1, 1], [2, 2], [3, 3]])
@@ -30,8 +32,8 @@ def run():
     random_data = [data[rand]]
     print(random_data)
 
-    kde = KernelDensity(kernel='gaussian', bandwidth=0.0001).fit(data)
-
+    kde = KernelDensity(kernel='gaussian', bandwidth=0.2).fit(data)
+    pickle.dumps(kde)
     return kde.score_samples(random_data)[0]
 
 
