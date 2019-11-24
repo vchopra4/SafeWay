@@ -29,7 +29,7 @@ class Testme extends React.Component {
                 { lat: step.lat1.lat, lng: step.lat1.lng },
                 { lat: step.lng1.lat, lng: step.lng1.lng }
               ]}
-              options={{ strokeColor: "#FF0000" }}
+              options={step.DgScr < 1 ? {strokeColor: "#00FF00"} : step.DgScr < 2 ? {strokeColor: "#FFFF00"} : {strokeColor: "#FF0000"}}
             />
           ))}
         </React.Fragment>
