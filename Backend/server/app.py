@@ -3,9 +3,11 @@ from flask_cors import CORS
 import googlemaps
 from datetime import datetime
 import json
+import HandleGeoData as hgd
 
 app = Flask(__name__, static_folder='app')
 CORS(app)
+hd = hgd.HandleData()
 
 
 @app.route("/direction", methods=['POST', 'GET'])
@@ -25,22 +27,29 @@ def direction():
                                      departure_time=now,
                                      region="ca")
 
-        
 
-        directions_result_dict = json.loads(directions_result)
-        print(directions_result_dict)
-        route = directions_result_dict["routes"]["legs"]
+        directions_result_temp = json.dumps(directions_result)
+        directions_result_dict = json.loads(directions_result_temp)
+        route = directions_result_dict[0]["legs"][0]["steps"]
         output = []
 
-        for steps in route:
-            for step in steps:
-                location = step["start_location"]
-                output.append([location["lat"], location["long"]])
-
-        print(output)
+        for i in range(len(route) - 1):
+            r_dict = {}
+            r_dict['lat1'] = route[i]['start_location']
+            r_dict['lng1'] = route[i]['end_location']
+            output.append(r_dict)
         # Here is where the model of processing should go
 
-    return # final results
+    
+    extras = hd.run_thread(output)
+
+    print(len(extras), len(output))
+
+    for i in range(len(output)):
+        r_dict = output[i]
+        r_dict['DgScr'] = extras[i]
+
+    return jsonify(output)# final results
 
 
 @app.route('/', defaults={'path': ''})
