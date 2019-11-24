@@ -3,6 +3,7 @@ from math import sqrt
 import pickle
 from sklearn.preprocessing import RobustScaler
 import numpy as np
+from math import pow
 
 
 class HandleProdGeo:
@@ -15,6 +16,8 @@ class HandleProdGeo:
             line = str(data.at[k, 'geometry']).strip()
             newLine = self.fixGeoDataFrameValue(line, STRIP)
             finalList.append(self.averageCoordinate(newLine.split(',')))
+
+        finalList = sorted(finalList, key=lambda n: n[0])
 
         return finalList
 
@@ -29,34 +32,37 @@ class HandleProdGeo:
         return finalList
 
     def getClosestDistance(self, location, coordinateList):
-        # closestIndex = 0
-        scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
-        scaler.fit(coordinateList)
-        coordinateList = scaler.transform(coordinateList)
+        closestIndex = 0
         closestDistance = self.findDistance(location, coordinateList[0])
-        for i in range(1, len(coordinateList)):
-            d = self.findDistance(location, coordinateList[i])
-            if d < closestDistance:
-                closestDistance = d
-                # closestIndex = i
-        return closestDistance
+        start = 0
+        end = len(coordinateList) - 1
+
+        while start < end:
+            mid = int((start + end)/2)
+            if location[0] > coordinateList[mid][0] and mid + 1 < len(coordinateList) and location[0] < coordinateList[mid][1]:
+                d = self.findDistance(location, coordinateList[mid])
+                return d, mid
+            elif location[0] > coordinateList[mid][0]:
+                start = mid + 1
+            else:
+                end = mid - 1
+
+        return closestDistance, closestIndex
 
     def getClosestIndex(self, location, coordinateList):
         closestIndex = 0
         closestDistance = self.findDistance(location, coordinateList[0])
         for i in range(1, len(coordinateList)):
-
             d = self.findDistance(location, coordinateList[i])
             if d < closestDistance:
                 closestDistance = d
                 closestIndex = i
         return closestIndex
 
-
     # only needs to be used internally
     def findDistance(self, pA, pB):
-        distance = sqrt((float(pA[0])-float(pB[0]))**2 + (float(pA[1])-float(pB[1]))**2)
-        return distance
+        distance = sqrt(pow(float(pA[0])-float(pB[0]), 2) + pow(float(pA[1])-float(pB[1]), 2))
+        return 111.9*distance
 
     def averageCoordinate(self, xyList):
         xSum = 0
@@ -70,7 +76,6 @@ class HandleProdGeo:
         avCoordinate = [xAverage, yAverage]
 
         return avCoordinate
-
 
     def fixGeoDataFrameValue(self, line, unwanted):
         newLine = ""
@@ -88,30 +93,23 @@ class HandleProdGeo:
         self.trafficValues = self.getVolumeCount("Traffic_Volumes.geojson")
 
 
-
 def run(location):
     prodGeo = HandleProdGeo()
-    closestSchool = prodGeo.getClosestDistance(location, prodGeo.schoolCoordinates)
-    closestIntersection = prodGeo.getClosestDistance(location, prodGeo.intersectionCoordinates)
-    closestLight = prodGeo.getClosestDistance(location, prodGeo.lightCoordinates)
-    closestSign = prodGeo.getClosestDistance(location, prodGeo.signCoordinates)
+
+    closestSchool, csi = prodGeo.getClosestDistance(location, prodGeo.schoolCoordinates)
+    closestIntersection, cii = prodGeo.getClosestDistance(location, prodGeo.intersectionCoordinates)
+    closestLight, cli = prodGeo.getClosestDistance(location, prodGeo.lightCoordinates)
+    closestSign, csig = prodGeo.getClosestDistance(location, prodGeo.signCoordinates)
     closestTrafficIndex = prodGeo.getClosestIndex(location, prodGeo.trafficCoordinates)
 
+    traffic = prodGeo.trafficValues[closestTrafficIndex]
 
-    trValsAdj = np.array(prodGeo.trafficValues)
-    trValsAdj = trValsAdj.reshape(-1, 1)
-    scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
-    scaler.fit(trValsAdj)
-    trVals = scaler.transform(trValsAdj)
-    traffic = trVals[closestTrafficIndex]
+    vals = [[traffic, closestIntersection, closestSchool, closestSign, closestLight]]
 
-    vals = [[closestIntersection, closestSchool, closestSign, closestLight, traffic]]
-    file = open('model.pickle', 'rb')
+    file = open('k_reg.pickle', 'rb')
     model = pickle.load(file)
 
-    hard_code_add = 44000
-
-    print(model.score_samples(vals)[0] + hard_code_add)
+    print(location, model.predict(vals)[0], prodGeo.intersectionCoordinates[cii])
 
 
 run([-81.273547, 43.011173])

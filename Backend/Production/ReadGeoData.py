@@ -3,6 +3,7 @@ import geopandas
 
 def getCoordinates(fileName, attribute):
     data = geopandas.read_file(fileName)
+    print(data)
     finalList = []
     STRIP = "POINTLESRG()"
     for k in range(len(data.loc[:, attribute])):
