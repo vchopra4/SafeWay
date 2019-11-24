@@ -4,8 +4,6 @@ import './reset.css';
 import './index.css';
 import Map from './Map'
 
-let response;
-
 class Topbar extends React.Component {
     render() {
         return (
@@ -35,29 +33,34 @@ class Search extends React.Component {
         });
     }
     handleSubmit(event) {
-        let payload = {
+        var details = {
             start: this.state.start,
-            end: this.state.end,
-            
-            };
-            let data = new FormData();
-            data.append( "json", JSON.stringify( payload ) );
+            end: this.state.end
+        };
+        
+        var formBody = [];
+        for (var property in details) {
+          var encodedKey = encodeURIComponent(property);
+          var encodedValue = encodeURIComponent(details[property]);
+          formBody.push(encodedKey + "=" + encodedValue);
+        }
+        formBody = formBody.join("&");     
 
-        response = fetch("http://127.0.0.1:5000/direction", {
+        fetch("http://127.0.0.1:5000/direction", {
             method: 'POST',
             headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
+                Accept: 'application/json, text/plain, */*',
+                'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            let json = response.json();
-            console.log(json);
-        } else {
-            alert("HTTP-Error: " + response.status)
-        }
+            body: formBody
+        }).then(function(u){
+            return u.json();
+        })
+        .then(
+            res => {
+                this.props.onEnterLocation(res);
+            }
+        );
         event.preventDefault();
     }
     render() {
@@ -74,12 +77,22 @@ class Search extends React.Component {
     }
 }
 class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {paths: [], render: false};
+    }
+
+    handleChange = (roads) => {
+        this.setState({paths: roads, render: true});
+        console.log(this.state.paths);
+    }
+
     render() {
         return (
             <div className="app">
                 <Topbar />
-                <Search />
-                <Map path={response}/>
+                <Search onEnterLocation={this.handleChange} />
+                <Map routes={this.state.pahts} render={this.state.render}/>
             </div>
             
 

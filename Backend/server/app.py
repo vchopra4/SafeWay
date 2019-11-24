@@ -11,6 +11,7 @@ CORS(app)
 @app.route("/direction", methods=['POST', 'GET'])
 def direction():
     error = None
+    
     if request.method == 'POST':
         start = request.form['start']
         end = request.form['end']
