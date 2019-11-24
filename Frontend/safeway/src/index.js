@@ -4,8 +4,6 @@ import './reset.css';
 import './index.css';
 import Map from './Map'
 
-let response;
-
 class Topbar extends React.Component {
     render() {
         return (
@@ -48,20 +46,19 @@ class Search extends React.Component {
         }
         formBody = formBody.join("&");     
 
-        response = fetch("http://127.0.0.1:5000/direction", {
+        fetch("http://127.0.0.1:5000/direction", {
             method: 'POST',
             headers: {
                 Accept: 'application/json, text/plain, */*',
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
             body: formBody
-        }).then(
+        }).then(function(u){
+            return u.json();
+        })
+        .then(
             res => {
-                if (res.statusText === 'OK') {
-                    console.log(res.json())
-                } else {
-                    alert("HTTP-Error: " + res.status)
-                }
+                this.props.onEnterLocation(res);
             }
         );
         event.preventDefault();
@@ -80,12 +77,22 @@ class Search extends React.Component {
     }
 }
 class App extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {paths: [], render: false};
+    }
+
+    handleChange = (roads) => {
+        this.setState({paths: roads, render: true});
+        console.log(this.state.paths);
+    }
+
     render() {
         return (
             <div className="app">
                 <Topbar />
-                <Search />
-                <Map path={response}/>
+                <Search onEnterLocation={this.handleChange} />
+                <Map routes={this.state.pahts} render={this.state.render}/>
             </div>
             
 

@@ -7,6 +7,10 @@ import {
 } from "react-google-maps";
 
 class Map extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {paths: [], isRendered: false};
+  }
   path = [
     { lat: 18.558908, lng: -68.389916 },
     { lat: 18.558853, lng: -68.389922 },
@@ -24,6 +28,9 @@ path2=[{ lat1: 18.558908, lng1: -68.389916, lat2: 18.558853, lng2: -68.389922}]
 
     let i = 0;
 
+    console.log(this.props.path);
+    console.log(this.props.renderP);
+    
     return (
       <React.Fragment>
         {this.path2.map(step => (
