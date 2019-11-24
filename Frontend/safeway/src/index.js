@@ -79,20 +79,25 @@ class Search extends React.Component {
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {paths: [], render: false};
+        this.state = {paths: [1,2,3,4], render: false};
     }
 
     handleChange = (roads) => {
         this.setState({paths: roads, render: true});
-        console.log(this.state.paths);
     }
 
     render() {
+        let path = this.state.paths;
+        let rend = this.state.render;
+
+        console.log(path);
+        console.log(rend);
         return (
             <div className="app">
                 <Topbar />
                 <Search onEnterLocation={this.handleChange} />
-                <Map routes={this.state.pahts} render={this.state.render}/>
+                {this.state.render ? <Map routesB={path} render={rend} /> : <div />}
+                {/* <Map routes={this.state.paths} render={this.state.render}/> */}
             </div>
             
 
