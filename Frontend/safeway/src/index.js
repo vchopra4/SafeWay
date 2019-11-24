@@ -1,8 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './reset.css';
+import {
+    withGoogleMap,
+    withScriptjs,
+    GoogleMap,
+    Polyline
+  } from "react-google-maps";
 import './index.css';
 import Map from './Map'
+import Testme from './TestMe';
 
 class Topbar extends React.Component {
     render() {
@@ -79,25 +86,51 @@ class Search extends React.Component {
 class App extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {paths: [1,2,3,4], render: false};
+        this.state = {paths: [1,2,3,4], render: false, finishedPaths: []};
     }
 
     handleChange = (roads) => {
         this.setState({paths: roads, render: true});
     }
 
-    render() {
-        let path = this.state.paths;
-        let rend = this.state.render;
+    drawPath() {
+        let i = 0;
+    
+        if (this.state.render) {
+          return (
+            <React.Fragment>
+              {this.state.paths.map(step => (
+                <Polyline
+                  key={i++}
+                  path={[
+                    { lat: step.lat1, lng: step.lng1 },
+                    { lat: step.lat2, lng: step.lng2 }
+                  ]}
+                  options={{ strokeColor: "#FF0000" }}
+                />
+              ))}
+            </React.Fragment>
+          );
+        }
+      };
 
-        console.log(path);
-        console.log(rend);
+    render() {
+
+        console.log(
+            'im in parent'
+        );
+        let myComp ;
+        if (this.state.render && this.state.paths) {
+            myComp = <Testme routesB={this.state.paths} render={this.state.render} />;
+        } else {
+            myComp = <div/>;
+        }
+        
         return (
             <div className="app">
                 <Topbar />
                 <Search onEnterLocation={this.handleChange} />
-                {this.state.render ? <Map routesB={path} render={rend} /> : <div />}
-                {/* <Map routes={this.state.paths} render={this.state.render}/> */}
+                {myComp}
             </div>
             
 

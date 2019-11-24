@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types'
 import {
   withGoogleMap,
   withScriptjs,
@@ -9,7 +10,8 @@ import {
 class Map extends React.Component {
   constructor(props) {
     super(props);
-
+    console.log('im in child');
+    console.log(props);
     this.state = { routes: [], finishedRoutes: [] };
   }
 
@@ -33,21 +35,43 @@ class Map extends React.Component {
       );
     }
   };
+  componentDidMount(){
+    console.log('here');
+    console.log(this.state);
+    console.log(this.props);
+    this.renderMap();
+  }
+
+  componentWillReceiveProps(props) {
+    console.log('will i recieve shit?');
+    console.log(this.props);
+    console.log(props);
+    
+  }
+
+  renderMap(){
+    let temp = this.drawPath();
+    this.setState({finishedRoutes: temp});
+  }
 
   render() {
+    console.log(this.state);
     console.log(this.props);
+    const {routesB, render} = this.props;
+    console.log(routesB)
+    console.log(render);
     return (
       <GoogleMap
         defaultZoom={12}
         defaultCenter={{ lat: 43.011173, lng: -81.273547 }}
       >
-        {this.drawPath()}
+        {this.state.finishedRoutes}
       </GoogleMap>
     );
   };
 }
 
-const MapComponent = withScriptjs(withGoogleMap(Map));
+let MapComponent = withScriptjs(withGoogleMap(Map));
 
 export default () => (
   <MapComponent

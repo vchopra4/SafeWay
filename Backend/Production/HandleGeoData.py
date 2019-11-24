@@ -1,14 +1,16 @@
-import geopandas
+
 from math import sqrt
 import pickle
-from sklearn.preprocessing import RobustScaler
-import numpy as np
 from math import pow
+import threading
+from collections import OrderedDict
+import json
 
 
 class HandleProdGeo:
     def getCoordinates(self, fileName):
-        data = geopandas.read_file(fileName)
+        data = json.loads(fileName)
+        print(data)
 
         finalList = []
         STRIP = "POINTLESRG()"
@@ -93,9 +95,7 @@ class HandleProdGeo:
         self.trafficValues = self.getVolumeCount("Traffic_Volumes.geojson")
 
 
-def run(location):
-    prodGeo = HandleProdGeo()
-
+def run(location, cost, prodGeo, model, id):
     closestSchool, csi = prodGeo.getClosestDistance(location, prodGeo.schoolCoordinates)
     closestIntersection, cii = prodGeo.getClosestDistance(location, prodGeo.intersectionCoordinates)
     closestLight, cli = prodGeo.getClosestDistance(location, prodGeo.lightCoordinates)
@@ -106,13 +106,46 @@ def run(location):
 
     vals = [[traffic, closestIntersection, closestSchool, closestSign, closestLight]]
 
-    file = open('k_reg.pickle', 'rb')
-    model = pickle.load(file)
+    cost[id] = model.predict(vals)[0]
 
-    print(location, model.predict(vals)[0], prodGeo.intersectionCoordinates[cii])
+    return True
+
+class HandleData:
+    def __init__(self):
+        self.prodGeo = HandleProdGeo()
+        file = open('k_reg.pickle', 'rb')
+        self.model = pickle.load(file)
 
 
-run([-81.273547, 43.011173])
-run([-81.253038, 42.996176])
-run([-81.207588, 43.000732])
-run([-81.276542, 43.001993])
+
+    def run_thread(self, coords):
+        cost = OrderedDict()
+        threads = []
+        
+        count = 0
+
+        for c in coords:
+            avg_lat = (c['lat1']['lat'] + c['lng1']['lat'])/2
+            avg_lng = (c['lat1']['lng'] + c['lng1']['lng'])/2
+            x = threading.Thread(target=run, args=([avg_lng, avg_lat], cost, self.prodGeo, self.model, count))
+            cost[count] = 0
+            count += 1
+            x.start()
+            threads.append(x)
+
+        flag = True
+        while flag:
+            flag = False
+            for i in threads:
+                flag = flag or i.is_alive()
+
+        for i in range(len(threads)):
+            threads[i].join()
+
+        total_cost = []
+        for cos in cost:
+            total_cost.append(cost[cos])
+
+        return total_cost
+
+

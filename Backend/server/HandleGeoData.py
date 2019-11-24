@@ -3,11 +3,11 @@ import pickle
 from math import pow
 import threading
 from collections import OrderedDict
-import geojson
+import geopandas
 
 class HandleProdGeo:
     def getCoordinates(self, fileName):
-        data = geojson.read_file(fileName)
+        data = geopandas.read_file(fileName)
 
         finalList = []
         STRIP = "POINTLESRG()"
