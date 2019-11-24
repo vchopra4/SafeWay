@@ -4,6 +4,10 @@ import pandas as pd
 import math
 import numpy as np
 import statsmodels.api as sm
+import ReadSHP
+from sklearn.kernel_ridge import KernelRidge
+import pickle
+
 
 
 def relationship_road_traffic_accidents():
@@ -17,6 +21,15 @@ def relationship_road_traffic_accidents():
 
     # Relationship between peak vehicle volume and # of accidents at that intersection
 
+    shp_files = glob.glob('shapefiles/*.shp')
+
+    shp_data_objs = []
+
+    for shp in shp_files:
+        print(shp)
+        shp_obj = ReadSHP.ReadSHPFile(shp, shp)
+        shp_data_objs.append(shp_obj)
+
     data = acc.data
 
     intersec_id = {}
@@ -25,7 +38,6 @@ def relationship_road_traffic_accidents():
     print('Running')
 
     for i in range(len(data)):
-        print(i)
         long = data[i].long
         lat = data[i].lat
         fatal = data[i].fatal
@@ -43,10 +55,18 @@ def relationship_road_traffic_accidents():
         else:
             intersec_id[min_index] += 1
 
+        if min_index not in other_xs:
+            missing_xs = []
+            for s in shp_data_objs:
+                missing_xs.append(s.binary_search(toronto_traffic.loc[min_index, 'Longitude'], toronto_traffic.loc[min_index, 'Latitude']))
+            other_xs[min_index] = missing_xs
+
     xs = []
     ys = []
     for j in intersec_id:
-        xs.append(toronto_traffic.loc[j, '8 Peak Hr Vehicle Volume'])
+        dt = [toronto_traffic.loc[j,  '8 Peak Hr Vehicle Volume']]
+        dt.extend(other_xs[j])
+        xs.append(dt)
         ys.append(intersec_id[j])
 
     print(xs)
@@ -59,6 +79,13 @@ def relationship_road_traffic_accidents():
 
     print(model.summary())
     print(model.params)
+
+    clf = KernelRidge(alpha=1.0)
+    clf.fit(xs, ys)
+
+    file = open('k_reg.pickle', 'wb')
+    pickle.dump(clf, file)
+    print(clf.get_params())
 
 
 relationship_road_traffic_accidents()

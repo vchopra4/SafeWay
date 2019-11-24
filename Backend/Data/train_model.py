@@ -4,15 +4,32 @@ import ReadAccident
 from sklearn.preprocessing import RobustScaler
 import pandas as pd
 import math
+import numpy as np
 
 
 def calc_dist_shp(shp, long, lat):
     return shp.binary_search(long, lat)
 
+toronto_traffic = pd.read_csv('traffic/traffic-vehicle.csv')
+
+def set_t_traffic():
+    global toronto_traffic
+    toronto_t = pd.read_csv('traffic/traffic-vehicle.csv')
+
+    scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
+    arr = toronto_t.loc[:, '8 Peak Hr Vehicle Volume'].values
+    sh = arr.shape
+    arr = arr.reshape(-1, 1)
+    scaler.fit(arr)
+    arr = scaler.transform(arr)
+    arr = arr.flatten()
+
+    toronto_t.loc[:, '8 Peak Hr Vehicle Volume'] = arr
+    toronto_traffic = toronto_t
+
 
 def dist_t_traffic(long, lat):
-    toronto_traffic = pd.read_csv('traffic/traffic-vehicle.csv')
-
+    global toronto_traffic
     min_index = 0
     min_dist = math.sqrt(
         math.pow(long - toronto_traffic.loc[0, 'Longitude'], 2) + math.pow(lat - toronto_traffic.loc[0, 'Latitude'], 2))
@@ -28,6 +45,7 @@ def dist_t_traffic(long, lat):
 
 
 def training_model():
+    set_t_traffic()
     shp_files = glob.glob('shapefiles/*.shp')
 
     shp_data_objs = []
@@ -75,9 +93,5 @@ def training_model():
             small_x.append(adjustment_traffic*dist_t_traffic(long, lat))
 
             X.append(small_x)
-
-    scaler = RobustScaler(copy=True, quantile_range=(25.0, 75.0), with_centering=True, with_scaling=True)
-    scaler.fit(X)
-    X = scaler.transform(X)
 
     return X
