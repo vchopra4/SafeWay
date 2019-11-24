@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import googlemaps
 from datetime import datetime
+import json
+
 app = Flask(__name__, static_folder='app')
 CORS(app)
 
@@ -19,11 +21,25 @@ def direction():
         directions_result = gmaps.directions(start,
                                      end,
                                      mode="driving",
-                                     departure_time=now)
+                                     departure_time=now,
+                                     region="ca")
+
         
+
+        directions_result_dict = json.loads(directions_result)
+        print(directions_result_dict)
+        route = directions_result_dict["routes"]["legs"]
+        output = []
+
+        for steps in route:
+            for step in steps:
+                location = step["start_location"]
+                output.append([location["lat"], location["long"]])
+
+        print(output)
         # Here is where the model of processing should go
 
-    return # jsonify(Array of values to go in Map.js)
+    return # final results
 
 
 @app.route('/', defaults={'path': ''})
