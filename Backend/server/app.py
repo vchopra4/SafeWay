@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-
+import googlemaps
+from datetime import datetime
 app = Flask(__name__, static_folder='app')
 CORS(app)
 
@@ -13,10 +14,17 @@ def direction():
         start = request.form['start']
         end = request.form['end']
         # Here is where the Google Maps Direction API should exist
-
+        
+        gmaps = googlemaps.Client(key='AIzaSyA05IZP-_GDgylMrM22XBYZ9qUxiTXjq-w')
+        now = datetime.now()
+        directions_result = gmaps.directions(start,
+                                     end,
+                                     mode="driving",
+                                     departure_time=now)
+        
         # Here is where the model of processing should go
 
-    return jsonify(start, end) # jsonify(Array of values to go in Map.js)
+    return # jsonify(Array of values to go in Map.js)
 
 
 @app.route('/', defaults={'path': ''})
